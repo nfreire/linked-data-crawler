@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.Lang;
 import org.semanticweb.yars.util.CallbackNxBufferedWriter;
 
 import com.ontologycentral.ldspider.Crawler;
@@ -34,6 +35,8 @@ import com.ontologycentral.ldspider.seen.Seen;
 
 import eu.europeana.commonculture.lod.crawler.http.AccessException;
 import eu.europeana.commonculture.lod.crawler.http.HttpRequestService;
+import eu.europeana.commonculture.lod.crawler.rdf.CallbackNtriplesBufferedWriterJena;
+import eu.europeana.commonculture.lod.crawler.rdf.CallbackTriplesQuadsBufferedWriter;
 import eu.europeana.commonculture.lod.crawler.rdf.RdfReg;
 import eu.europeana.commonculture.lod.crawler.rdf.RdfUtil;
 
@@ -56,8 +59,8 @@ public class Test {
 					frontier.add(new URI(st.getObject().asNode().getURI().toString()));
 					totalSeeds++;
 					
-//					if(totalSeeds>=3)
-//						break;
+					if(totalSeeds>=3)
+						break;
 				}
 			} else { //try a Distribution of the dataset
 				throw new RuntimeException("TODO");
@@ -67,8 +70,9 @@ public class Test {
 			crawler.setContentHandler(contentHandler);
 			FileWriter out=new FileWriter(new File("target/centsprenten.nt"));
 			BufferedWriter out2 = new BufferedWriter(out);
-			CallbackNxBufferedWriter writer=new CallbackNxBufferedWriter(out2, false);
-			Sink sink = new SinkCallback(writer);
+			CallbackTriplesQuadsBufferedWriter writer=new CallbackTriplesQuadsBufferedWriter(out2, false, Lang.NTRIPLES);
+//			CallbackNtriplesBufferedWriter writer=new CallbackNtriplesBufferedWriter(out2, false);
+			Sink sink = new SinkCallback(writer, false);
 			crawler.setOutputCallback(sink);		
 			LinkFilterDomain linkFilter = new LinkFilterDomain(frontier);  
 			linkFilter.addHost("http://data.bibliotheken.nl/");  
